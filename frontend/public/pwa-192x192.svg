@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff1a6"/>
+      <stop offset="45%" stop-color="#d4a72c"/>
+      <stop offset="100%" stop-color="#fff0a0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="192" height="192" rx="34" fill="#090909"/>
+  <rect x="5" y="5" width="182" height="182" rx="30"
+        fill="none" stroke="url(#gold)" stroke-width="3"/>
+
+  <path d="M59 76 V58 Q59 34 82 34 Q105 34 105 58 V76"
+        fill="none" stroke="url(#gold)" stroke-width="7"
+        stroke-linecap="round"/>
+
+  <path d="M43 70 H121 L130 139 H34 Z"
+        fill="#111111" stroke="url(#gold)" stroke-width="4"
+        stroke-linejoin="round"/>
+
+  <text x="82" y="119" text-anchor="middle"
+        font-family="Arial, sans-serif" font-size="49"
+        font-weight="bold" fill="url(#gold)">M</text>
+
+  <text x="111" y="119" text-anchor="middle"
+        font-family="Arial, sans-serif" font-size="43"
+        font-weight="bold" fill="#ffffff">C</text>
+
+  <path d="M36 145 H156" stroke="url(#gold)" stroke-width="2"/>
+  <text x="96" y="164" text-anchor="middle"
+        font-family="Arial, sans-serif" font-size="14"
+        font-weight="bold" fill="url(#gold)">MAC-CHERU</text>
+</svg>
