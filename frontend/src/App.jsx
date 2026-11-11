@@ -10,7 +10,7 @@ const styles = {adminPage: {
 },
 
 sidebar: {
-  width: "260px",
+  width: "140px",
   minHeight: "100vh",
   background: "linear-gradient(180deg, #0f172a 0%, #172554 100%)",
   color: "#ffffff",
