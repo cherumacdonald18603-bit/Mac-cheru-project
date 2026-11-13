@@ -3550,23 +3550,80 @@ if (loggedIn && userRole === "admin") {
 
 if (loggedIn && userRole === "seller") {
   return (
-    <div
-  style={{
-    padding: "40px",
-    fontFamily: "Arial, sans-serif",
-    background: "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)",
-color: "#0f172a",
-    minHeight: "100vh",
-  }}
->
+    <div className="mc-seller-page">
       <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>
   Seller Dashboard
 </h1>
       <p>
   Manage your products, track orders, and monitor your sales on Mac-Cheru.
 </p>
+{/* SELLER DASHBOARD OVERVIEW */}
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+    gap: "18px",
+    marginTop: "28px",
+    marginBottom: "30px",
+  }}
+>
+  {[
+    {
+      title: "Total Sales",
+      value: `KSh ${sellerTotalSales.toLocaleString()}`,
+      icon: "💰",
+    },
+    {
+      title: "Total Orders",
+      value: sellerOrders.length,
+      icon: "📦",
+    },
+    {
+      title: "Products Listed",
+      value: products.length,
+      icon: "🛍️",
+    },
+    {
+      title: "Your Earnings",
+      value: `KSh ${sellerEarnings.toLocaleString()}`,
+      icon: "💳",
+    },
+  ].map((item) => (
+    <div
+      key={item.title}
+      style={{
+        padding: "24px",
+        borderRadius: "16px",
+        background: "linear-gradient(145deg, #172943, #101d32)",
+        border: "1px solid rgba(212,175,55,0.35)",
+        borderTop: "4px solid #d4af37",
+        boxShadow: "0 8px 22px rgba(0,0,0,0.2)",
+      }}
+    >
+      <div style={{ fontSize: "27px", marginBottom: "12px" }}>
+        {item.icon}
+      </div>
+
+      <p style={{ fontSize: "14px", margin: "0 0 10px", color: "#a8b5c8" }}>
+        {item.title}
+      </p>
+
+      <h2
+        style={{
+          fontSize: "23px",
+          margin: 0,
+          color: "#f5d77b",
+          overflowWrap: "anywhere",
+        }}
+      >
+        {item.value}
+      </h2>
+    </div>
+  ))}
+</div>
 <div style={{ marginTop: "30px" }}>
-  <div style={{ marginTop: "30px" }}>
+  <div className="mc-seller-panel mc-store-panel" style={{ marginTop: "30px" }}>
   <h2
   style={{
     color: "#0f172a",
@@ -3649,7 +3706,15 @@ color: "#0f172a",
     </p>
   )}
 </div>
-  <h2 style={{ fontSize: "24px", marginBottom: "15px" }}>
+  <h2
+  style={{
+    fontSize: "24px",
+    marginBottom: "18px",
+    color: "#f5d77b",
+    paddingBottom: "12px",
+    borderBottom: "2px solid #d4af37",
+  }}
+>
   My Products
 </h2>
   <button
@@ -3670,18 +3735,24 @@ color: "#0f172a",
 {products.length === 0 ? (
   <p>No products added yet.</p>
 ) : (
-  <div style={{ marginTop: "20px" }}>
+  <div
+  style={{
+    marginTop: "20px",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "18px",
+  }}
+>
     {products.map((product) => (
       <div
         key={product.id}
         style={{
-  border: "1px solid #e2e8f0",
+  border: "1px solid rgba(212,175,55,0.3)",
   borderLeft: "5px solid #d4af37",
-  borderRadius: "14px",
-  padding: "24px",
-  marginBottom: "18px",
-  background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-  boxShadow: "0 8px 22px rgba(15, 23, 42, 0.07)",
+  borderRadius: "16px",
+  padding: "22px",
+  background: "linear-gradient(145deg, #172943, #101d32)",
+  boxShadow: "0 8px 22px rgba(0,0,0,0.2)",
 }}
       >
         <h3 style={{ marginTop: "0", fontSize: "20px" }}>
@@ -3812,353 +3883,319 @@ boxShadow: "0 4px 10px rgba(15, 23, 42, 0.12)",
 </button>
   </div>
 )}
-      <div style={{ marginTop: "40px" }}>
-  <h2 style={{ fontSize: "24px", marginBottom: "15px" }}>
-  Orders
-</h2>
+      {/* PROFESSIONAL SELLER ORDERS SECTION */}
+
+<div className="mc-seller-orders" style={{ marginTop: "40px" }}>
+
+  <div className="mc-orders-heading">
+    <div>
+      <h2>Customer Orders</h2>
+      <p>Manage and process orders received from your customers.</p>
+    </div>
+
+    <div className="mc-orders-count">
+      {sellerOrders.length} Total Orders
+    </div>
+  </div>
 
   {sellerOrders.length === 0 ? (
-    <p>No orders yet.</p>
-  ) : (
-    <div>
-      {sellerOrders.map((order) => (
-        <div
-          key={order.id}
-          style={{
-border: "1px solid #e2e8f0",
-borderLeft: "5px solid #d4af37",
-borderRadius: "14px",
-padding: "24px",
-marginBottom: "18px",
-background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-boxShadow: "0 8px 22px rgba(15, 23, 42, 0.07)",
-}}
-        >
-          <h3>{order.products?.name}</h3>
-          <p>Price: KSh {order.products?.price}</p>
-          <p>Quantity: {order.quantity}</p>
-          <p>
-  Status:{" "}
-  <strong
-    style={{
-      display: "inline-block",
-padding: "5px 12px",
-borderRadius: "20px",
-fontSize: "12px",
-fontWeight: "bold",
-textTransform: "uppercase",
-color:
-order.status === "accepted"
-? "#047857"
-: order.status === "rejected" || order.status === "cancelled"
-? "#b91c1c"
-: "#92400e",
-backgroundColor:
-order.status === "accepted"
-? "#d1fae5"
-: order.status === "rejected" || order.status === "cancelled"
-? "#fee2e2"
-: "#fef3c7",
-    }}
-  >
-    {order.status}
-  </strong>
-</p>
-<p>
-  Payment:{" "}
-  <strong
-    style={{
-display: "inline-block",
-padding: "5px 12px",
-borderRadius: "20px",
-fontSize: "12px",
-fontWeight: "bold",
-textTransform: "uppercase",
-color:
-order.payment_status === "paid"
-? "#047857"
-: order.payment_status === "failed"
-? "#b91c1c"
-: "#92400e",
-backgroundColor:
-order.payment_status === "paid"
-? "#d1fae5"
-: order.payment_status === "failed"
-? "#fee2e2"
-: "#fef3c7",
-}}
-  >
-    {order.payment_status || "pending"}
-  </strong>
-</p>
-          <button
-  onClick={async () => {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "accepted" })
-      .eq("id", order.id);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Order accepted!");
-
-    setSellerOrders((currentOrders) =>
-      currentOrders.map((item) =>
-        item.id === order.id
-          ? { ...item, status: "accepted" }
-          : item
-      )
-    );
-  }}
-  style={{
-padding: "11px 18px",
-background: "linear-gradient(135deg, #059669, #047857)",
-color: "#ffffff",
-border: "none",
-borderRadius: "9px",
-fontSize: "14px",
-fontWeight: "bold",
-marginTop: "10px",
-cursor: "pointer",
-boxShadow: "0 4px 10px rgba(5, 150, 105, 0.2)",
-}}
->
-  Accept Order
-</button>
-<button
-  onClick={async () => {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "rejected" })
-      .eq("id", order.id);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Order rejected!");
-
-    setSellerOrders((currentOrders) =>
-      currentOrders.map((item) =>
-        item.id === order.id
-          ? { ...item, status: "rejected" }
-          : item
-      )
-    );
-  }}
-  style={{
-padding: "11px 18px",
-background: "linear-gradient(135deg, #ea580c, #c2410c)",
-color: "#ffffff",
-border: "none",
-borderRadius: "9px",
-fontSize: "14px",
-fontWeight: "bold",
-marginTop: "10px",
-marginLeft: "10px",
-cursor: "pointer",
-boxShadow: "0 4px 10px rgba(194, 65, 12, 0.2)",
-}}
->
-  Reject Order
-</button>
-        </div>
-      ))}
+    <div className="mc-empty-orders">
+      <div style={{ fontSize: "42px" }}>📦</div>
+      <h3>No Orders Yet</h3>
+      <p>Customer orders will appear here when someone purchases your products.</p>
     </div>
+  ) : (
+
+    <div className="mc-orders-grid">
+
+      {sellerOrders.map((order) => (
+
+        <div className="mc-order-card" key={order.id}>
+
+          <div className="mc-order-top">
+            <div>
+              <span className="mc-order-label">ORDER</span>
+              <h3>{order.products?.name || "Product"}</h3>
+            </div>
+
+            <span className={`mc-order-status ${order.status}`}>
+              {order.status || "pending"}
+            </span>
+          </div>
+
+          <div className="mc-order-details">
+
+            <div>
+              <span>Product Price</span>
+              <strong>
+                KSh {Number(order.products?.price || 0).toLocaleString()}
+              </strong>
+            </div>
+
+            <div>
+              <span>Quantity</span>
+              <strong>{order.quantity}</strong>
+            </div>
+
+            <div>
+              <span>Payment Status</span>
+              <strong className={`mc-payment-status ${order.payment_status || "pending"}`}>
+                {order.payment_status || "pending"}
+              </strong>
+            </div>
+
+          </div>
+
+          <div className="mc-order-actions">
+
+            <button
+              type="button"
+              disabled={order.status === "accepted"}
+              onClick={async () => {
+
+                const { error } = await supabase
+                  .from("orders")
+                  .update({ status: "accepted" })
+                  .eq("id", order.id);
+
+                if (error) {
+                  alert(error.message);
+                  return;
+                }
+
+                alert("Order accepted!");
+
+                setSellerOrders((currentOrders) =>
+                  currentOrders.map((item) =>
+                    item.id === order.id
+                      ? { ...item, status: "accepted" }
+                      : item
+                  )
+                );
+              }}
+              className="mc-accept-order"
+            >
+              Accept Order
+            </button>
+
+            <button
+              type="button"
+              disabled={order.status === "rejected"}
+              onClick={async () => {
+
+                const { error } = await supabase
+                  .from("orders")
+                  .update({ status: "rejected" })
+                  .eq("id", order.id);
+
+                if (error) {
+                  alert(error.message);
+                  return;
+                }
+
+                alert("Order rejected!");
+
+                setSellerOrders((currentOrders) =>
+                  currentOrders.map((item) =>
+                    item.id === order.id
+                      ? { ...item, status: "rejected" }
+                      : item
+                  )
+                );
+              }}
+              className="mc-reject-order"
+            >
+              Reject Order
+            </button>
+
+          </div>
+
+        </div>
+
+      ))}
+
+    </div>
+
   )}
+
 </div>
 
 
 
  {/* Seller Earnings */}
 
-<div
-  style={{
-    marginTop: "40px",
-    padding: "26px",
-    border: "1px solid #e2e8f0",
-    borderTop: "5px solid #d4af37",
-    borderRadius: "16px",
-    background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-    boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
-  }}
->
-  <h2
-    style={{
-      color: "#0f172a",
-      fontSize: "24px",
-      marginTop: 0,
-      marginBottom: "22px",
-    }}
-  >
-    Seller Earnings
-  </h2>  <div style={{ display: "grid", gap: "14px" }}>
-    <div style={{ padding: "16px", backgroundColor: "#f1f5f9", borderRadius: "10px" }}>
-      <p style={{ margin: "0 0 6px", color: "#64748b", fontSize: "14px" }}>
-        Total Sales
-      </p>
-      <strong style={{ fontSize: "22px", color: "#0f172a" }}>
-        KSh {sellerTotalSales.toLocaleString()}
-      </strong>
-    </div><div style={{ padding: "16px", backgroundColor: "#fff7ed", borderRadius: "10px" }}>
-  <p style={{ margin: "0 0 6px", color: "#9a3412", fontSize: "14px" }}>
-    Mac-Cheru Commission ({commissionRate}%)
-  </p>
-  <strong style={{ fontSize: "22px", color: "#c2410c" }}>
-    KSh {sellerCommission.toLocaleString()}
-  </strong>
-</div>
+{/* PROFESSIONAL SELLER EARNINGS DASHBOARD */}
 
-<div style={{ padding: "16px", backgroundColor: "#ecfdf5", borderRadius: "10px" }}>
-  <p style={{ margin: "0 0 6px", color: "#047857", fontSize: "14px" }}>
-    Your Earnings
-  </p>
-  <strong style={{ fontSize: "25px", color: "#047857" }}>
-    KSh {sellerEarnings.toLocaleString()}
-  </strong>
-</div>
+<div className="mc-seller-finances">
+
+  <div className="mc-finance-heading">
+    <h2>Financial Overview</h2>
+    <p>Track your sales, marketplace commission and earnings.</p>
+  </div>
+
+  <div className="mc-finance-grid">
+
+    <div className="mc-finance-card">
+      <div className="mc-finance-icon">💰</div>
+      <p>Total Sales</p>
+      <h3>KSh {sellerTotalSales.toLocaleString()}</h3>
+      <span>Overall sales value</span>
+    </div>
+
+    <div className="mc-finance-card">
+      <div className="mc-finance-icon">🏦</div>
+      <p>Mac-Cheru Commission</p>
+      <h3>KSh {sellerCommission.toLocaleString()}</h3>
+      <span>Commission rate: {commissionRate}%</span>
+    </div>
+
+    <div className="mc-finance-card mc-finance-highlight">
+      <div className="mc-finance-icon">📈</div>
+      <p>Your Earnings</p>
+      <h3>KSh {sellerEarnings.toLocaleString()}</h3>
+      <span>Your earnings after commission</span>
+    </div>
+
+    <div className="mc-finance-card">
+      <div className="mc-finance-icon">💳</div>
+      <p>Available for Withdrawal</p>
+      <h3>KSh {sellerEarnings.toLocaleString()}</h3>
+      <span>Based on your current earnings</span>
+    </div>
 
   </div>
+
+  <div className="mc-finance-note">
+    <strong>Financial Information</strong>
+    <p>
+      Mac-Cheru automatically deducts the applicable marketplace
+      commission from sales. Your earnings represent the amount
+      remaining after commission.
+    </p>
+  </div>
+
 </div>
   {/* Payment Details */}
 
-<div
-  style={{
-    marginTop: "30px",
-    padding: "26px",
-    border: "1px solid #e2e8f0",
-    borderTop: "5px solid #059669",
-    borderRadius: "16px",
-    background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-    boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
-  }}
->
-  <h2 style={{ color: "#0f172a", marginTop: 0, fontSize: "24px" }}>
-    Payment Details
-  </h2>  <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-    Enter the M-Pesa number where you want to receive your seller earnings.
-  </p><input
-type="tel"
-placeholder="M-Pesa phone number"
-value={sellerPhone}
-onChange={(e) => setSellerPhone(e.target.value)}
-style={{
-...styles.input,
-width: "100%",
-boxSizing: "border-box",
-borderRadius: "10px",
-padding: "13px",
-border: "1px solid #cbd5e1",
-marginBottom: "16px",
-}}
-/>
+{/* PROFESSIONAL PAYMENT DETAILS */}
 
-<button
-type="button"
-onClick={async () => {
-const { data: { user } } = await supabase.auth.getUser();
+<div className="mc-payment-details">
 
-  if (!user) {
-    alert("Please log in first.");
-    return;
-  }
+  <div className="mc-payment-heading">
+    <div>
+      <h2>Payment Details</h2>
+      <p>Manage where you receive your Mac-Cheru earnings.</p>
+    </div>
+    <span className="mc-payment-icon">💳</span>
+  </div>
 
-  const { error } = await supabase
-    .from("profiles")
-    .update({ phone: sellerPhone })
-    .eq("id", user.id);
+  <div className="mc-payment-info">
+    <strong>M-Pesa Payment Account</strong>
+    <p>
+      Enter the M-Pesa phone number where you want to receive
+      your seller earnings. Make sure the number is correct.
+    </p>
+  </div>
 
-  if (error) {
-    console.log("PAYMENT DETAILS ERROR:", error);
-    alert(error.message);
-    return;
-  }
+  <label className="mc-payment-label">
+    M-Pesa Phone Number
+  </label>
 
-  alert("Payment details saved successfully.");
-}}
-style={{
-  background: "linear-gradient(135deg, #059669, #047857)",
-  color: "#ffffff",
-  border: "none",
-  borderRadius: "10px",
-  padding: "13px 20px",
-  fontSize: "15px",
-  fontWeight: "bold",
-  cursor: "pointer",
-  boxShadow: "0 5px 12px rgba(5, 150, 105, 0.2)",
-}}
->
+  <input
+    type="tel"
+    placeholder="e.g. 0712345678"
+    value={sellerPhone}
+    onChange={(e) => setSellerPhone(e.target.value)}
+    className="mc-payment-input"
+  />
 
-Save Payment Details
-</button>
+  <button
+    type="button"
+    onClick={async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        alert("Please log in first.");
+        return;
+      }
+
+      if (!sellerPhone.trim()) {
+        alert("Please enter your M-Pesa phone number.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({ phone: sellerPhone })
+        .eq("id", user.id);
+
+      if (error) {
+        console.log("PAYMENT DETAILS ERROR:", error);
+        alert(error.message);
+        return;
+      }
+
+      alert("Payment details saved successfully.");
+    }}
+    className="mc-payment-save"
+  >
+    <span>✓</span> Save Payment Details
+  </button>
+
+  <div className="mc-payment-security">
+    <span>🔒</span>
+    Your payment information is stored securely in your account.
+  </div>
+
 </div>
 {/* Withdraw Earnings */}
 
-<div
-  style={{
-    marginTop: "30px",
-    padding: "26px",
-    border: "1px solid #e2e8f0",
-    borderTop: "5px solid #d4af37",
-    borderRadius: "16px",
-    background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-    boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
-  }}
->
-  <h2 style={{ color: "#0f172a", marginTop: 0, fontSize: "24px" }}>
-    Withdraw Earnings
-  </h2>  <p style={{ color: "#64748b", lineHeight: 1.6 }}>
-    Available for withdrawal:
-  </p>  <div
-    style={{
-      padding: "18px",
-      marginBottom: "18px",
-      borderRadius: "12px",
-      background: "#ecfdf5",
-    }}
+{/* PROFESSIONAL WITHDRAWAL SECTION */}
+
+<div className="mc-withdrawal-panel">
+
+  <div className="mc-withdrawal-heading">
+    <div>
+      <h2>Withdraw Earnings</h2>
+      <p>Request payment of your available seller earnings.</p>
+    </div>
+    <span className="mc-withdrawal-icon">💸</span>
+  </div>
+
+  <div className="mc-withdrawal-balance">
+    <span>AVAILABLE BALANCE</span>
+    <h3>KSh {sellerEarnings.toLocaleString()}</h3>
+    <p>Your current seller earnings</p>
+  </div>
+
+  <label className="mc-withdrawal-label">
+    Withdrawal Amount (KSh)
+  </label>
+
+  <input
+    type="number"
+    placeholder="Enter amount to withdraw"
+    value={withdrawalAmount}
+    onChange={(e) => setWithdrawalAmount(e.target.value)}
+    min="1"
+    className="mc-withdrawal-input"
+  />
+
+  <button
+    type="button"
+    onClick={requestWithdrawal}
+    className="mc-withdrawal-button"
   >
-    <strong style={{ color: "#047857", fontSize: "26px" }}>
-      KSh {sellerEarnings.toLocaleString()}
-    </strong>
-  </div><input
-type="number"
-placeholder="Enter amount to withdraw"
-value={withdrawalAmount}
-onChange={(e) => setWithdrawalAmount(e.target.value)}
-style={{
-...styles.input,
-width: "100%",
-boxSizing: "border-box",
-borderRadius: "10px",
-padding: "13px",
-marginBottom: "16px",
-}}
-/>
-
-<button
-type="button"
-onClick={requestWithdrawal}
-style={{
-background: "linear-gradient(135deg, #059669, #047857)",
-color: "#ffffff",
-border: "none",
-borderRadius: "10px",
-padding: "13px 20px",
-fontSize: "15px",
-fontWeight: "bold",
-cursor: "pointer",
-boxShadow: "0 5px 12px rgba(5, 150, 105, 0.2)",
-}}
->
-
-Request Withdrawal
-
+    <span>↗</span> Request Withdrawal
   </button>
-</div>{/* Reports & Complaints */}
+
+  <div className="mc-withdrawal-notice">
+    <span>ℹ️</span>
+    Withdrawal requests are submitted for processing.
+  </div>
+
+</div>
+{/* Reports & Complaints */}
 
 <div
   style={{
