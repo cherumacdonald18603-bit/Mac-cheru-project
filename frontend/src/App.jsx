@@ -4290,25 +4290,29 @@ marginBottom: "14px",
 
 if (loggedIn && userRole === "buyer") {
   return (
-    <div
-  style={{
-  padding: "40px",
-  fontFamily: "Arial, sans-serif",
-  background: "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)",
-  minHeight: "100vh",
-  color: "#0f172a",
-}}
->
-      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>
-  Buyer Dashboard
-</h1>
-      <p>
-  Browse products, manage your orders, and track your purchases on Mac-Cheru.
-</p>
-<div style={{ marginTop: "30px" }}>
-  <h2 style={{ fontSize: "24px", marginBottom: "15px" }}>
-  Stores
-</h2>
+    <div className="mc-buyer-page">
+      <div className="mc-buyer-header">
+  <div>
+    <span className="mc-buyer-eyebrow">WELCOME TO MAC-CHERU</span>
+    <h1>Buyer Dashboard</h1>
+    <p>
+      Discover stores, explore products and manage all your purchases in one place.
+    </p>
+  </div>
+
+  <div className="mc-buyer-header-icon">
+    🛍️
+  </div>
+</div>
+<div className="mc-buyer-stores-section">
+  <div className="mc-buyer-section-heading">
+    <div>
+      <span>DISCOVER MAC-CHERU</span>
+      <h2>Explore Stores</h2>
+      <p>Find sellers and discover products available in their stores.</p>
+    </div>
+    <div className="mc-buyer-section-icon">🏪</div>
+  </div>
 
 {selectedStore && (
   <div style={{ marginTop: "20px" }}>
@@ -4319,8 +4323,9 @@ if (loggedIn && userRole === "buyer") {
     ) : (
       storeProducts.map((product) => (
         <div
-          key={product.id}
-          style={{
+  className="mc-buyer-store-product-card"
+  key={product.id}
+  style={{
             border: "1px solid #ddd",
             borderRadius: "8px",
             padding: "15px",
@@ -4334,185 +4339,161 @@ if (loggedIn && userRole === "buyer") {
 
           <p>{product.description}</p>
 
-          <button
-            type="button"
-            onClick={async (e) => {
-              e.preventDefault();
+          
+<button
+  type="button"
+  onClick={async (e) => {
+    e.preventDefault();
 
-              const { data: { user } } =
-                await supabase.auth.getUser();
+    const { data: { user } } =
+      await supabase.auth.getUser();
 
-              if (!user) {
-                alert("Please log in first.");
-                return;
-              }
-              // Check whether the marketplace is open
-const { data: marketplace, error: marketplaceError } =
-  await supabase
-    .from("marketplace_settings")
-    .select("is_open")
-    .eq("id", 1)
-    .single();
+    if (!user) {
+      alert("Please log in first.");
+      return;
+    }
 
-if (marketplaceError) {
-  console.log("MARKETPLACE CHECK ERROR:", marketplaceError);
-  alert("Unable to verify marketplace availability. Please try again.");
-  return;
-}
+    // Check whether the marketplace is open
+    const { data: marketplace, error: marketplaceError } =
+      await supabase
+        .from("marketplace_settings")
+        .select("is_open")
+        .eq("id", 1)
+        .single();
 
-if (!marketplace.is_open) {
-  alert("Mac-Cheru is temporarily paused. Please try again later.");
-  return;
-}
+    if (marketplaceError) {
+      console.log("MARKETPLACE CHECK ERROR:", marketplaceError);
+      alert("Unable to verify marketplace availability. Please try again.");
+      return;
+    }
 
-              // Create the order
-              const { data: order, error: orderError } =
-                await supabase
-                  .from("orders")
-                  .insert([
-                    {
-                      buyer_id: user.id,
-                      product_id: product.id,
-                      quantity: 1,
-                    },
-                  ])
-                  .select()
-                  .single();
+    if (!marketplace.is_open) {
+      alert("Mac-Cheru is temporarily paused. Please try again later.");
+      return;
+    }
 
-              if (orderError) {
-                console.log("ORDER ERROR:", orderError);
-                alert(orderError.message);
-                return;
-              }
+    // Create the order
+    const { data: order, error: orderError } =
+      await supabase
+        .from("orders")
+        .insert([
+          {
+            buyer_id: user.id,
+            product_id: product.id,
+            quantity: 1,
+          },
+        ])
+        .select()
+        .single();
 
-              // Get product price
-              const amount = Number(product.price);
+    if (orderError) {
+      console.log("ORDER ERROR:", orderError);
+      alert(orderError.message);
+      return;
+    }
 
-              // Get current commission rate
-              const { data: settings, error: settingsError } =
-                await supabase
-                  .from("settings")
-                  .select("commission_rate")
-                  .single();
+    // Get product price
+    const amount = Number(product.price);
 
-              if (settingsError) {
-                console.log("SETTINGS ERROR:", settingsError);
-                alert(settingsError.message);
-                return;
-              }
+    // Get current commission rate
+    const { data: settings, error: settingsError } =
+      await supabase
+        .from("settings")
+        .select("commission_rate")
+        .single();
 
-              const commissionRate =
-                Number(settings.commission_rate);
+    if (settingsError) {
+      console.log("SETTINGS ERROR:", settingsError);
+      alert(settingsError.message);
+      return;
+    }
 
-              const commission =
-                amount * (commissionRate / 100);
+    const commissionRate = Number(settings.commission_rate);
+    const commission = amount * (commissionRate / 100);
+    const sellerAmount = amount - commission;
 
-              const sellerAmount =
-                amount - commission;
+    // Create payment record
+    const { error: paymentError } =
+      await supabase
+        .from("payments")
+        .insert([
+          {
+            order_id: order.id,
+            buyer_id: user.id,
+            seller_id: product.seller_id,
+            amount: amount,
+            commission: commission,
+            seller_amount: sellerAmount,
+            status: "pending",
+          },
+        ]);
 
-              // Create payment record
-              const { error: paymentError } =
-                await supabase
-                  .from("payments")
-                  .insert([
-                    {
-                      order_id: order.id,
-                      buyer_id: user.id,
-                      seller_id: product.seller_id,
-                      amount: amount,
-                      commission: commission,
-                      seller_amount: sellerAmount,
-                      status: "pending",
-                    },
-                  ]);
+    if (paymentError) {
+      console.log("PAYMENT ERROR:", paymentError);
+      alert(paymentError.message);
+      return;
+    }
 
-              if (paymentError) {
-                console.log(
-                  "PAYMENT ERROR:",
-                  paymentError
-                );
-                alert(paymentError.message);
-                return;
-              }
+    // Ask buyer for M-Pesa number
+    const phone = prompt("Enter your M-Pesa phone number:");
 
-              // Ask buyer for M-Pesa number
-              const phone = prompt(
-                "Enter your M-Pesa phone number:"
-              );
+    if (!phone) {
+      alert("Payment cancelled.");
+      return;
+    }
 
-              if (!phone) {
-                alert("Payment cancelled.");
-                return;
-              }
+    // Start M-Pesa payment
+    const {
+      data: mpesaData,
+      error: mpesaError,
+    } = await supabase.functions.invoke(
+      "hyper-action",
+      {
+        body: {
+          amount: amount,
+          phone: phone,
+          callbackUrl:
+            "https://nhuvvhdppwzxnvefgzwv.supabase.co/functions/v1/mpesa-callback",
+          accountReference: "Mac-Cheru",
+        },
+      }
+    );
 
-              // Start M-Pesa payment
-              const {
-                data: mpesaData,
-                error: mpesaError,
-              } = await supabase.functions.invoke(
-                "hyper-action",
-                {
-                  body: {
-                    amount: amount,
-                    phone: phone,
-                    callbackUrl:
-                      "https://nhuvvhdppwzxnvefgzwv.supabase.co/functions/v1/mpesa-callback",
-                    accountReference: "Mac-Cheru",
-                  },
-                }
-              );
+    if (mpesaError) {
+      console.log("MPESA ERROR:", mpesaError);
+      alert(mpesaError.message);
+      return;
+    }
 
-              if (mpesaError) {
-                console.log(
-                  "MPESA ERROR:",
-                  mpesaError
-                );
-                alert(mpesaError.message);
-                return;
-              }
+    console.log("MPESA RESPONSE:", mpesaData);
 
-              console.log(
-                "MPESA RESPONSE:",
-                mpesaData
-              );
+    // Save CheckoutRequestID
+    const {
+      error: updatePaymentError,
+    } = await supabase.rpc(
+      "save_checkout_request",
+      {
+        p_order_id: order.id,
+        p_checkout_request_id:
+          mpesaData.CheckoutRequestID,
+      }
+    );
 
-              // Save CheckoutRequestID
-              const {
-                error: updatePaymentError,
-              } = await supabase.rpc(
-                "save_checkout_request",
-                {
-                  p_order_id: order.id,
-                  p_checkout_request_id:
-                    mpesaData.CheckoutRequestID,
-                }
-              );
+    if (updatePaymentError) {
+      console.log("PAYMENT UPDATE ERROR:", updatePaymentError);
+      alert(updatePaymentError.message);
+      return;
+    }
 
-              if (updatePaymentError) {
-                console.log(
-                  "PAYMENT UPDATE ERROR:",
-                  updatePaymentError
-                );
-                alert(updatePaymentError.message);
-                return;
-              }
+    alert(
+      "M-Pesa payment prompt sent. Please check your phone."
+    );
+  }}
+  className="mc-buyer-buy-button"
+>
+  Buy Now
+</button>
 
-              alert(
-                "M-Pesa payment prompt sent. Please check your phone."
-              );
-            }}
-            style={{
-              padding: "10px 15px",
-              border: "none",
-              borderRadius: "6px",
-              backgroundColor: "#2563eb",
-              color: "white",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            Buy Now
-          </button>
         </div>
       ))
     )}
@@ -4534,7 +4515,8 @@ if (!marketplace.is_open) {
           backgroundColor: "white",
         }}
       >
-        <div
+       <div
+  className="mc-buyer-store-card"
   onClick={() => setSelectedStore(store)}
   style={{
     background: "linear-gradient(135deg, #0f172a, #1e293b)",
@@ -4585,15 +4567,21 @@ if (!marketplace.is_open) {
   </div>
 )}
 
-<h2 style={{ fontSize: "24px", marginBottom: "15px" }}>
-  Available Products
-</h2>
+<div className="mc-buyer-section-heading mc-available-products-heading">
+  <div>
+    <span>SHOP ON MAC-CHERU</span>
+    <h2>Available Products</h2>
+    <p>Explore products from sellers across the marketplace.</p>
+  </div>
+  <div className="mc-buyer-section-icon">🛍️</div>
+</div>
   {buyerProducts.length === 0 ? (
   <p>No products available yet.</p>
 ) : (
   <div style={{ marginTop: "20px" }}>
     {buyerProducts.map((product) => (
       <div
+  className="mc-buyer-product-card"
   key={product.id}
   style={{
     border: "1px solid #e2e8f0",
@@ -4740,9 +4728,14 @@ alert("M-Pesa payment prompt sent. Please check your phone.");
 
       
         <div style={{ marginTop: "40px" }}>
-  <h2 style={{ fontSize: "24px", marginBottom: "15px" }}>
-  My Orders
-</h2>
+  <div className="mc-buyer-section-heading mc-buyer-orders-heading">
+  <div>
+    <span>YOUR PURCHASES</span>
+    <h2>My Orders</h2>
+    <p>View your purchases and keep track of their progress.</p>
+  </div>
+  <div className="mc-buyer-section-icon">📦</div>
+</div>
 
   {buyerOrders.length === 0 ? (
     <p>No orders yet.</p>
@@ -4843,7 +4836,14 @@ alert("M-Pesa payment prompt sent. Please check your phone.");
   )}
 </div>
 <div style={{ marginTop: "40px" }}>
-  <h2>Reports & Complaints</h2>
+  <div className="mc-buyer-section-heading mc-buyer-reports-heading">
+  <div>
+    <span>WE'RE HERE TO HELP</span>
+    <h2>Reports & Complaints</h2>
+    <p>Contact the Mac-Cheru team if you experience any problems.</p>
+  </div>
+  <div className="mc-buyer-section-icon">🛟</div>
+</div>
 
   <input
     type="text"
